@@ -1,0 +1,65 @@
+# Environment & Secrets
+.env
+.env.*
+*.env
+!.env.example
+smart-internship-portal/.env
+smart-internship-portal/.env.*
+!smart-internship-portal/.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+instance/
+.pytest_cache/
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Node / Frontend
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+
+# Databases
+*.sqlite
+*.sqlite3
+*.db
+**/database/*.db
+smart_internship.db
+
+# User Uploaded Content
+**/static/uploads/resumes/*
+!**/static/uploads/resumes/.gitkeep
+**/static/uploads/*
+!**/static/uploads/.gitkeep
+
+# IDEs and Editors
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
