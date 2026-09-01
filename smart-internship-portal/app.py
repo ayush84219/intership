@@ -10,16 +10,27 @@ def create_app():
     app.config.from_object(Config)
 
     # Enable CORS for React frontend and production domains
-    allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',') if os.environ.get('ALLOWED_ORIGINS') else [
+    default_origins = [
+        "https://intership7.onrender.com",
         "http://localhost:5173", "http://127.0.0.1:5173",
         "http://localhost:5174", "http://127.0.0.1:5174",
         "http://localhost:5000", "http://127.0.0.1:5000",
         "http://localhost:3000", "http://localhost:3005"
     ]
-    CORS(app, supports_credentials=True, origins=allowed_origins if allowed_origins != ['*'] else "*")
+    env_origins = [o.strip() for o in os.environ.get('ALLOWED_ORIGINS', '').split(',') if o.strip()]
+    allowed_origins = list(set(default_origins + env_origins)) if env_origins else default_origins
+
+    CORS(app, supports_credentials=True, origins=allowed_origins)
+
+    # Cross-site cookie configuration for HTTPS deployments
+    if os.environ.get('RENDER') or os.environ.get('DATABASE_URL') or os.environ.get('FLASK_ENV') == 'production':
+        app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+        app.config['SESSION_COOKIE_SECURE'] = True
+        app.config['SESSION_COOKIE_HTTPONLY'] = True
 
     # Initialize extensions
     db.init_app(app)
+
 
     # Register API Blueprints
     app.register_blueprint(auth_bp)

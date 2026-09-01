@@ -11,8 +11,11 @@ import StudentDashboard from './pages/StudentDashboard';
 import CompanyDashboard from './pages/CompanyDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
-// Configure Axios defaults to handle sessions with Flask
+// Configure Axios defaults to handle sessions with Flask across environments
 axios.defaults.withCredentials = true;
+if (import.meta.env.VITE_API_BASE_URL) {
+  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+}
 
 export default function App() {
   const [user, setUser] = useState(null);
