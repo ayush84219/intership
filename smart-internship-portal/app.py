@@ -9,8 +9,14 @@ def create_app():
     app = Flask(__name__, static_folder='frontend/dist', static_url_path='')
     app.config.from_object(Config)
 
-    # Enable CORS for React frontend
-    CORS(app, supports_credentials=True, origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174", "http://localhost:5000", "http://127.0.0.1:5000"])
+    # Enable CORS for React frontend and production domains
+    allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',') if os.environ.get('ALLOWED_ORIGINS') else [
+        "http://localhost:5173", "http://127.0.0.1:5173",
+        "http://localhost:5174", "http://127.0.0.1:5174",
+        "http://localhost:5000", "http://127.0.0.1:5000",
+        "http://localhost:3000", "http://localhost:3005"
+    ]
+    CORS(app, supports_credentials=True, origins=allowed_origins if allowed_origins != ['*'] else "*")
 
     # Initialize extensions
     db.init_app(app)
@@ -21,6 +27,12 @@ def create_app():
     app.register_blueprint(company_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(jobs_bp)
+
+    # Health check for Render / Cloud monitors
+    @app.route('/health', methods=['GET'])
+    @app.route('/api/health', methods=['GET'])
+    def health_check():
+        return jsonify({'status': 'healthy', 'service': 'Smart Internship Portal API'}), 200
 
     # Public API endpoint for landing page
     @app.route('/api/public/landing', methods=['GET'])
@@ -58,8 +70,11 @@ def create_app():
             }), 200
 
     with app.app_context():
-        db.create_all()
-        seed_database()
+        try:
+            db.create_all()
+            seed_database()
+        except Exception as e:
+            print(f"[Warning] Initial DB setup error (will retry on next request): {e}")
 
     return app
 
